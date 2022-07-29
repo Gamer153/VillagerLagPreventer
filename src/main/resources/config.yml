@@ -1,0 +1,7 @@
+# On what blocks the villager AI should be soft-disabled, have to exist in https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+villager-noai-blocks:
+  - BEDROCK
+  - EMERALD_BLOCK
+
+# How often the villagers should be checked
+villager-noai-check-ticks: 100

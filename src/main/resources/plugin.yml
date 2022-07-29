@@ -1,0 +1,20 @@
+name: VillagerLagPreventer
+version: '${version}'
+main: dev.gamer153.villagerlagpreventer.VillagerLagPreventer
+api-version: 1.19
+author: Gamer153
+description: Soft-disables villager AI when it's standing on a specific block to prevent lag
+website: https://gamer153.dev
+
+commands:
+  villagerlagpreventerreload:
+    description: Reload the VillagerLagPreventer config
+    usage: /<command>
+    permission: villagerlagpreventer.reload
+    aliases:
+      - vlpreload
+
+permissions:
+  villagerlagpreventer.reload:
+    description: Use /villagerlagpreventerreload
+    default: op
