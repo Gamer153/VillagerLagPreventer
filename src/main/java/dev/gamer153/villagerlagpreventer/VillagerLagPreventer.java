@@ -1,9 +1,6 @@
 package dev.gamer153.villagerlagpreventer;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,13 +34,6 @@ public final class VillagerLagPreventer extends JavaPlugin {
             logger.severe("For this plugin to work, the server has to run MC 1.19! VillagerLagPrevention is disabled.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
-        }
-
-        try {
-            handleMethod = Villager.class.getMethod("getHandle");
-            handleMethod.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
         }
 
         if (!new File(getDataFolder(), "config.yml").exists()) {
@@ -85,6 +75,7 @@ public final class VillagerLagPreventer extends JavaPlugin {
             if (task != null) task.cancel();
             reloadConfig();
             task = startTask(world);
+            sender.sendMessage(ChatColor.GREEN + "VillagerLagPreventer config reloaded.");
             return true;
         });
 
@@ -99,7 +90,7 @@ public final class VillagerLagPreventer extends JavaPlugin {
                     if (entity == null) continue;
                     if (entity.getWorld().getChunkAt(entity.getLocation()).isLoaded()) {
                         try {
-                            if (entity.getProfession() != Villager.Profession.NONE && noRecipesBlockedFor(entity) && !hasLevelUpReady(entity))
+                            if (entity.getProfession() != Villager.Profession.NONE && noRecipesBlockedFor(entity) && !shouldLevelUp(entity))
                                 entity.setAware(!hasNoAIBlocks(entity));
                             else entity.setAware(true);
                         } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
@@ -120,10 +111,14 @@ public final class VillagerLagPreventer extends JavaPlugin {
         return true;
     }
 
-    private boolean hasLevelUpReady(Villager villager) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    private boolean shouldLevelUp(Villager villager) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        if (handleMethod == null) {
+            handleMethod = villager.getClass().getMethod("getHandle");
+            handleMethod.setAccessible(true);
+        }
         Object handle = handleMethod.invoke(villager);
         if (handleGetLevelUpReadyMethod == null) {
-            handleGetLevelUpReadyMethod = handle.getClass().getMethod("gf");
+            handleGetLevelUpReadyMethod = handle.getClass().getDeclaredMethod("gq");
             handleGetLevelUpReadyMethod.setAccessible(true);
         }
         return (Boolean) handleGetLevelUpReadyMethod.invoke(handle);
